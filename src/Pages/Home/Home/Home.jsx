@@ -7,7 +7,7 @@ import BeMerchant from '../BeMerchant/BeMerchant';
 
 const Home = () => {
     return (
-        <div>
+        <div className='mt-8'>
             <Banner></Banner>
             <OurService></OurService>
             <ClientLogosMarquee></ClientLogosMarquee>
