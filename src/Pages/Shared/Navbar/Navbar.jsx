@@ -4,7 +4,15 @@ import ProFastLogo from "./ProFastLogo/ProFastLogo";
 import UseAuth from "../../../hooks/useAuth";
 
 const Navbar = () => {
-  const {user} = UseAuth()
+  const { user, logOut } = UseAuth();
+
+  const handleLogOut = () => {
+    logOut()
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => console.log(error));
+  };
   const navItems = (
     <>
       <li>
@@ -16,13 +24,13 @@ const Navbar = () => {
       <li>
         <NavLink to={"/coverage"}>Coverage</NavLink>
       </li>
-      {
-        user && <>
-        <li>
-        <NavLink to={"/dashboard"}>Dash Board</NavLink>
-      </li>
+      {user && (
+        <>
+          <li>
+            <NavLink to={"/dashboard"}>Dash Board</NavLink>
+          </li>
         </>
-      }
+      )}
       <li>
         <NavLink to={"/about"}>About us</NavLink>
       </li>
@@ -57,14 +65,28 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="btn btn-ghost text-xl">
-            <ProFastLogo></ProFastLogo>
+          <ProFastLogo></ProFastLogo>
         </div>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">{navItems}</ul>
       </div>
       <div className="navbar-end">
-        <Link to="/login" className="btn btn-primary text-black text-xl px-8 py-5">Login</Link>
+        {user ? (
+          <button
+            onClick={handleLogOut}
+            className="btn btn-primary text-black text-xl px-8 py-5"
+          >
+            Log Out
+          </button>
+        ) : (
+          <Link
+            to="/login"
+            className="btn btn-primary text-black text-xl px-8 py-5"
+          >
+            Login
+          </Link>
+        )}
       </div>
     </div>
   );
