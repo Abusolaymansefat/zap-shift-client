@@ -1,35 +1,78 @@
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import React from 'react';
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { useParams } from "react-router";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const PaymentForm = () => {
-    const stripe = useStripe();
-    const elements = useElements()
+  const stripe = useStripe();
+  const elements = useElements();
+  const {ParcelId} = useParams();
+  const axiosSecure = useAxiosSecure()
+  
 
-     const handleSubmit = e => {
-            e.preventDefault()
+  const [error, setError] = useState('')
 
-            if(!stripe || !elements){
-                return
-            }
 
-            const card = elements.getElement(CardElement)
+  const {isPending, data: parcelInfo = {}} = useQuery({
+    queryKey: ['parcels', ParcelId],
+    queryFn: async() => {
+        const res = await axiosSecure.get(`/parcels/${ParcelId}`)
+        return res.data
+    }
+  })
+  if(isPending){
+    return '...loading'
+  }
+  console.log(parcelInfo)
+  const amount = parcelInfo.cost;
 
-            if(!card){
-                return
-            }
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    return (       
-        <div>
-            <form onSubmit={handleSubmit}>
-                <CardElement>
-                    <button type='submit' disabled= {!stripe}>
-                        pay for parcel pickup
-                    </button>
-                </CardElement>
-            </form>
-        </div>
-    );
+    if (!stripe || !elements) {
+      return;
+    }
+
+    const card = elements.getElement(CardElement);
+
+    if (!card) {
+      return;
+    }
+
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
+      type: "card",
+      card,
+    });
+    if (error) {
+      setError(error.message)
+    } else {
+        setError('')
+      console.log("payment method", paymentMethod);
+    }
+  };
+
+  return (
+    <div>
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 bg-white p-6 rounded-xl shadow-md w-full max-w-md mx-auto"
+      >
+        <CardElement className="p-2 border rounded ">
+          
+        </CardElement>
+        <button
+           type="submit"
+           className="btn btn-primary text-black w-full"
+            disabled={!stripe}>
+            pay ${amount}
+          </button>
+          {
+            error && <p className="text-red-600">{error}</p>
+          }
+      </form>
+    </div>
+  );
 };
 
 export default PaymentForm;
