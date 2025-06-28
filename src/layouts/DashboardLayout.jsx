@@ -1,6 +1,13 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router";
 import ProFastLogo from "../Pages/Shared/Navbar/ProFastLogo/ProFastLogo";
+import {
+  FaHome,
+  FaBoxOpen,
+  FaHistory,
+  FaSearchLocation,
+  FaUserEdit,
+} from "react-icons/fa";
 
 const DashboardLayout = () => {
   return (
@@ -31,9 +38,7 @@ const DashboardLayout = () => {
             </label>
           </div>
           <div className="mx-2 flex-1 px-2 lg:hidden">Dash Bord</div>
-          <div className="hidden flex-none lg:hidden">
-            
-          </div>
+          <div className="hidden flex-none lg:hidden"></div>
         </div>
         {/* Page content here */}
         <Outlet></Outlet>
@@ -49,10 +54,38 @@ const DashboardLayout = () => {
           {/* Sidebar content here */}
           <ProFastLogo></ProFastLogo>
           <li>
-            <a>Home</a>
+            <NavLink to="/dashboard/home" className="flex items-center gap-2">
+              <FaHome /> Home
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/Dashboard/myParcels">My parcels</NavLink>
+            <NavLink
+              to="/dashboard/myParcels"
+              className="flex items-center gap-2"
+            >
+              <FaBoxOpen /> My Parcels
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/dashboard/paymentHistory"
+              className="flex items-center gap-2"
+            >
+              <FaHistory /> Payment History
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/dashboard/track" className="flex items-center gap-2">
+              <FaSearchLocation /> Track a Package
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/dashboard/profile"
+              className="flex items-center gap-2"
+            >
+              <FaUserEdit /> Update Profile
+            </NavLink>
           </li>
         </ul>
       </div>
