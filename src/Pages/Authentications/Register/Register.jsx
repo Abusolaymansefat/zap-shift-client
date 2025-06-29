@@ -1,29 +1,83 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import UseAuth from "../../../hooks/UseAuth";
 import { Link } from "react-router";
 import SocialLogin from "../SocialLogin/SocialLogin";
+import axios from "axios";
 
 const Register = () => {
   const { register, handleSubmit, formState: {errors} } = useForm();
-  const {createUser} = UseAuth()
+  const {createUser, updeteUserProfile} = UseAuth()
+  const [profilePic, setProfilePic] = useState('')
 
   const onSubmit = (data) => {
     console.log(data);
     createUser(data.email, data.password)
     .then ( result => {
         console.log(result.user)
+
+        //update userinfo in the database
+
+
+        //updete user profile in firebase 
+        const userProfile = {
+          displayName: data.name,
+          photoURL: profilePic
+        }
+        updeteUserProfile(userProfile)
+        .then(() => {
+          console.log('profile name pic updated')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+
     })
     .catch(error => {
         console.error(error)
     })
   };
+
+  const handleImageUpload =async(e) => {
+    const image = e.target.files[0]
+    console.log(image)
+    const formData = new FormData();
+    formData.append('image', image)
+    const imageUploadUrl= `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_image_uploa_key}`
+
+    const res = await axios.post(imageUploadUrl, formData)
+
+    setProfilePic(res.data.data.url)
+
+  }
   return (
     <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
       <div className="card-body">
         <h1 className="text-5xl font-bold">Create an Account!</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
           <fieldset className="fieldset">
+
+            {/* name fild  */}
+            <label className="label">Your Name </label>
+            <input
+              type="name"
+              {...register("name", {required: true})}
+              className="input"
+              placeholder="Your name"
+            />
+            {
+                errors.email?.type === 'required' && 
+                <p className="text-red-600"> Name is required</p>
+            }
+
+            <label className="label">Your Name </label>
+            <input
+              type="file"
+              onChange={handleImageUpload}
+              className="input"
+              placeholder="Your profile picture"
+            />
+          {/* email fild */}
             <label className="label">Email</label>
             <input
               type="email"

@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../../firebase/firebase-inet";
 
@@ -28,6 +29,11 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     return signOut(auth);
   };
+
+
+  const updeteUserProfile = profileInfo => {
+    return updateProfile(auth.currentUser, profileInfo)
+  }
 
   const signInWithGoogle = () => {
     setLoading(true)
@@ -51,6 +57,7 @@ const AuthProvider = ({ children }) => {
     createUser,
     signIn,
     signInWithGoogle,
+    updeteUserProfile,
     logOut,
     
   };
