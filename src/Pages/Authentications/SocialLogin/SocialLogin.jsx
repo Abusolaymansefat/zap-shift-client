@@ -1,31 +1,46 @@
 import React from "react";
-import UseAuth from "../../../hooks/useAuth";
+// import UseAuth from "../../../hooks/UseAuth";
 import { useLocation, useNavigate } from "react-router";
+import UseAuth from "../../../hooks/UseAuth";
+import useAxios from "../../../hooks/useAxios";
 
 const SocialLogin = () => {
+  const { signInWithGoogle } = UseAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from || "/";
+  const axiosInstance = useAxios();
 
-    const {signInWithGoogle} = UseAuth();
-    const location = useLocation();
-    const navigate = useNavigate();
-    const from = location.state?.from||'/';
+  const handleGoogleSigIn = () => {
+    signInWithGoogle()
+      .then(async (result) => {
+        const user = result.user;
+        console.log(result.user);
+        const userInfo = {
+          email: user.email,
+          role: "user", //default role
+          created_at: new Date().toISOString(),
+          last_log_in: new Date().toISOString(),
+        };
 
-    const handleGoogleSigIn = () => {
-        signInWithGoogle()
-        .then(result => {
-            console.log(result.user)
-            navigate(from)
-        })
-        .catch(error => {
-            console.error(error)
-        })
-    }
+        const res = await axiosInstance.post("/users", userInfo);
+        console.log('user update info',res.data);
+
+        navigate(from);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
-
     <div className="text-center">
       <p className="mb-2">or</p>
-     
-      <button onClick={handleGoogleSigIn} className="btn w-full bg-white text-black border-[#e5e5e5]">
+
+      <button
+        onClick={handleGoogleSigIn}
+        className="btn w-full bg-white text-black border-[#e5e5e5]"
+      >
         <svg
           aria-label="Google logo"
           width="16"

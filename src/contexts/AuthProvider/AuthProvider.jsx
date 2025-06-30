@@ -30,15 +30,14 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   };
 
-
-  const updeteUserProfile = profileInfo => {
-    return updateProfile(auth.currentUser, profileInfo)
-  }
+  const updeteUserProfile = (profileInfo) => {
+    return updateProfile(auth.currentUser, profileInfo);
+  };
 
   const signInWithGoogle = () => {
-    setLoading(true)
-    return signInWithPopup(auth, googleProvider)
-  }
+    setLoading(true);
+    return signInWithPopup(auth, googleProvider);
+  };
 
   useEffect(() => {
     const unSuscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -59,7 +58,6 @@ const AuthProvider = ({ children }) => {
     signInWithGoogle,
     updeteUserProfile,
     logOut,
-    
   };
 
   return <AuthContext value={authInfo}>{children}</AuthContext>;
