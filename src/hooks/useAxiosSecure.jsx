@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React from 'react';
-import UseAuth from './UseAuth';
+import UseAuth from './useAuth';
+// import UseAuth from './UseAuth';
 
 const axiosSecure = axios.create({
     baseURL: `http://localhost:3000`
