@@ -9,6 +9,7 @@ import {
   FaUserEdit,
   FaHourglassHalf,
   FaMotorcycle,
+  FaUserShield,
 } from "react-icons/fa";
 
 const DashboardLayout = () => {
@@ -99,12 +100,23 @@ const DashboardLayout = () => {
               <FaMotorcycle /> Active Riders
             </NavLink>
           </li>
+
+        
           <li>
             <NavLink
               to="/dashboard/pendingRiders"
               className="flex items-center gap-2"
             >
               <FaHourglassHalf /> Pending Riders
+            </NavLink>
+          </li>
+            {/* admin router  */}
+          <li>
+            <NavLink
+              to="/dashboard/makeAdmin"
+              className="flex items-center gap-2"
+            >
+              <FaUserShield /> Make Admin
             </NavLink>
           </li>
         </ul>
