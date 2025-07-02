@@ -99,6 +99,14 @@ const DashboardLayout = () => {
             <>
               <li>
                 <NavLink
+                  to="/dashboard/assinRiders"
+                  className="flex items-center gap-2"
+                >
+                  <FaMotorcycle />Assin Riders
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
                   to="/dashboard/activeRiders"
                   className="flex items-center gap-2"
                 >
