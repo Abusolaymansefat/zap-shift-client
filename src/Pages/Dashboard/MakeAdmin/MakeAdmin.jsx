@@ -1,9 +1,3 @@
-// import { useState } from "react";
-// import { useMutation, useQuery } from "@tanstack/react-query";
-// import { FaSearch, FaUserShield, FaUserTimes } from "react-icons/fa";
-// import Swal from "sweetalert2";
-// import useAxiosSecure from "../../../hooks/useAxiosSecure";
-
 import { useState } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useMutation, useQuery } from "@tanstack/react-query";

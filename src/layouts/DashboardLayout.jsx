@@ -11,8 +11,11 @@ import {
   FaMotorcycle,
   FaUserShield,
 } from "react-icons/fa";
+import useUserRole from "../hooks/useUserRole";
 
 const DashboardLayout = () => {
+  const { role, roleLoading } = useUserRole();
+  console.log(role);
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -92,33 +95,36 @@ const DashboardLayout = () => {
           </li>
 
           {/* rideers link */}
-          <li>
-            <NavLink
-              to="/dashboard/activeRiders"
-              className="flex items-center gap-2"
-            >
-              <FaMotorcycle /> Active Riders
-            </NavLink>
-          </li>
+          { !roleLoading && role === 'admin' &&
+            <>
+              <li>
+                <NavLink
+                  to="/dashboard/activeRiders"
+                  className="flex items-center gap-2"
+                >
+                  <FaMotorcycle /> Active Riders
+                </NavLink>
+              </li>
 
-        
-          <li>
-            <NavLink
-              to="/dashboard/pendingRiders"
-              className="flex items-center gap-2"
-            >
-              <FaHourglassHalf /> Pending Riders
-            </NavLink>
-          </li>
-            {/* admin router  */}
-          <li>
-            <NavLink
-              to="/dashboard/makeAdmin"
-              className="flex items-center gap-2"
-            >
-              <FaUserShield /> Make Admin
-            </NavLink>
-          </li>
+              <li>
+                <NavLink
+                  to="/dashboard/pendingRiders"
+                  className="flex items-center gap-2"
+                >
+                  <FaHourglassHalf /> Pending Riders
+                </NavLink>
+              </li>
+              {/* admin router  */}
+              <li>
+                <NavLink
+                  to="/dashboard/makeAdmin"
+                  className="flex items-center gap-2"
+                >
+                  <FaUserShield /> Make Admin
+                </NavLink>
+              </li>
+            </>
+          }
         </ul>
       </div>
     </div>
