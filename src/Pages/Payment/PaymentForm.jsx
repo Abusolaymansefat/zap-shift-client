@@ -1,6 +1,6 @@
+import React, { useState } from "react";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
@@ -18,7 +18,7 @@ const PaymentForm = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Fetch parcel info using react-query
+  // Fetch parcel info by ID
   const { isPending, data: parcelInfo = {} } = useQuery({
     queryKey: ["parcels", parcelId],
     queryFn: async () => {
@@ -30,88 +30,90 @@ const PaymentForm = () => {
 
   if (isPending) {
     return (
-      <div className="text-center py-10 font-semibold">
-        Loading parcel info...
+      <div className="min-h-[60vh] flex justify-center items-center">
+        <span className="loading loading-spinner loading-md"></span>
       </div>
     );
   }
 
-  // যদি parcelInfo থেকে payment_status পাওয়া যায় এবং paid হয়, সেটাকে ধরে নিচ্ছি পেমেন্ট হয়েছে
   const isPaid = parcelInfo?.payment_status === "paid";
-
   const amount = parcelInfo?.cost || 0;
-  const amountInCents = Math.round(amount * 100); // Stripe expects integer cents
+  const amountInCents = Math.round(amount * 100);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!stripe || !elements || isPaid) return; // যদি already paid হয় তাহলে কাজ করবেনা
-
-    const card = elements.getElement(CardElement);
-    if (!card) return;
+    if (!stripe || !elements || isPaid) return;
 
     setIsProcessing(true);
     setError("");
 
+    const card = elements.getElement(CardElement);
+    if (!card) return;
+
     // Step 1: Create payment method
-    const { error: paymentMethodError } = await stripe.createPaymentMethod({
+    const { error: methodError } = await stripe.createPaymentMethod({
       type: "card",
       card,
     });
 
-    if (paymentMethodError) {
-      setError(paymentMethodError.message);
+    if (methodError) {
+      setError(methodError.message);
       setIsProcessing(false);
       return;
     }
 
     try {
-      // Step 2: Create payment intent on backend
-      const res = await axiosSecure.post("/create-payment-intent", {
-        amount: amountInCents,
-        parcelId,
+      // Step 2: Create payment intent from backend
+      const intentRes = await axiosSecure.post("/create-payment-intent", {
+        amountInCents,
       });
 
-      const clientSecret = res.data.clientSecret;
+      const clientSecret = intentRes?.data?.clientSecret;
 
-      // Step 3: Confirm the payment
-      const result = await stripe.confirmCardPayment(clientSecret, {
+      if (!clientSecret) {
+        setError("Payment intent creation failed.");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Step 3: Confirm payment with Stripe
+      const confirmResult = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card,
           billing_details: {
-            name: user.displayName,
+            name: user.displayName || "Anonymous",
             email: user.email,
           },
         },
       });
 
-      if (result.error) {
-        setError(result.error.message);
+      if (confirmResult.error) {
+        setError(confirmResult.error.message);
         setIsProcessing(false);
         return;
       }
 
-      if (result.paymentIntent.status === "succeeded") {
+      if (confirmResult.paymentIntent.status === "succeeded") {
         setPaymentSuccess(true);
 
-        // Step 4: Save payment info to backend and update parcel payment_status
+        // Step 4: Save payment info to backend
         const paymentData = {
           parcelId,
           email: user.email,
           amount,
-          transactionId: result.paymentIntent.id,
-          paymentMethod: result.paymentIntent.payment_method_types,
+          transactionId: confirmResult.paymentIntent.id,
+          paymentMethod: confirmResult.paymentIntent.payment_method_types[0],
         };
 
         const saveRes = await axiosSecure.post("/payments", paymentData);
 
-        if (saveRes.data.insertedId) {
+        if (saveRes.data?.insertedId) {
           await Swal.fire({
             icon: "success",
             title: "Payment Successful!",
-            html: `<strong>Transaction ID:</strong> <code>${result.paymentIntent.id}</code>`,
+            html: `<strong>Transaction ID:</strong> <code>${confirmResult.paymentIntent.id}</code>`,
             confirmButtonText: "Go to My Parcels",
           });
-
           navigate("/dashboard/myParcels");
         }
       }
@@ -127,14 +129,14 @@ const PaymentForm = () => {
     <div className="min-h-[60vh] flex justify-center items-center">
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 bg-white p-6 rounded-xl shadow-md w-full max-w-md"
+        className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md"
       >
         <h2 className="text-2xl font-semibold mb-4 text-center">
-          Make a Payment
+          Complete Your Payment
         </h2>
 
         {!isPaid ? (
-          <CardElement className="p-2 border rounded" />
+          <CardElement className="p-2 border rounded-md" />
         ) : (
           <div className="p-4 bg-green-100 text-green-800 rounded text-center font-semibold">
             Payment Already Completed
@@ -143,7 +145,7 @@ const PaymentForm = () => {
 
         <button
           type="submit"
-          className={`btn w-full text-white ${
+          className={`btn w-full mt-4 text-white ${
             isPaid ? "bg-green-600 cursor-not-allowed" : "btn-primary"
           }`}
           disabled={!stripe || isProcessing || isPaid}
@@ -151,9 +153,9 @@ const PaymentForm = () => {
           {isPaid ? "Paid" : isProcessing ? "Processing..." : `Pay $${amount}`}
         </button>
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
         {paymentSuccess && !isPaid && (
-          <p className="text-green-600 font-medium">Payment successful!</p>
+          <p className="text-green-600 font-medium mt-2">Payment successful!</p>
         )}
       </form>
     </div>

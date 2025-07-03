@@ -17,7 +17,6 @@ const AssignRider = () => {
       const res = await axiosSecure.get(
         "/parcels?payment_status=paid&delivery_status=not_collected"
       );
-      // Sort oldest first
       return res.data.sort(
         (a, b) => new Date(a.creation_date) - new Date(b.creation_date)
       );
@@ -28,6 +27,7 @@ const AssignRider = () => {
     mutationFn: async ({ parcelId, rider }) => {
       const res = await axiosSecure.patch(`/parcels/${parcelId}/assign`, {
         riderId: rider._id,
+        riderEmail: rider.email,
         riderName: rider.name,
       });
       return res.data;
@@ -42,7 +42,6 @@ const AssignRider = () => {
     },
   });
 
-  // Step 2: Open modal and load matching riders
   const openAssignModal = async (parcel) => {
     setSelectedParcel(parcel);
     setLoadingRiders(true);
@@ -51,7 +50,7 @@ const AssignRider = () => {
     try {
       const res = await axiosSecure.get("/riders/available", {
         params: {
-          district: parcel.sender_center, // match with rider.district
+          district: parcel.sender_center,
         },
       });
       setRiders(res.data);
@@ -88,28 +87,42 @@ const AssignRider = () => {
               </tr>
             </thead>
             <tbody>
-              {parcels.map((parcel) => (
-                <tr key={parcel._id}>
-                  <td>{parcel.tracking_id}</td>
-                  <td>{parcel.title}</td>
-                  <td>{parcel.type}</td>
-                  <td>{parcel.sender_center}</td>
-                  <td>{parcel.receiver_center}</td>
-                  <td>৳{parcel.cost}</td>
-                  <td>{new Date(parcel.creation_date).toLocaleDateString()}</td>
-                  <td>
-                    <button
-                      onClick={() => openAssignModal(parcel)}
-                      className="btn btn-sm btn-primary text-black"
-                    >
-                      <FaMotorcycle className="inline-block mr-1" />
-                      Assign Rider
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {parcels.map((parcel) => {
+                const isAssigned = parcel.delivery_status === "in_transit";
+                return (
+                  <tr
+                    key={parcel._id}
+                    className={isAssigned ? "bg-green-100" : ""}
+                  >
+                    <td>{parcel.tracking_id}</td>
+                    <td>{parcel.title}</td>
+                    <td>{parcel.type}</td>
+                    <td>{parcel.sender_center}</td>
+                    <td>{parcel.receiver_center}</td>
+                    <td>৳{parcel.cost}</td>
+                    <td>
+                      {new Date(parcel.creation_date).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => openAssignModal(parcel)}
+                        className={`btn btn-sm ${
+                          isAssigned
+                            ? "btn-success cursor-not-allowed"
+                            : "btn-primary text-black"
+                        }`}
+                        disabled={isAssigned}
+                      >
+                        <FaMotorcycle className="inline-block mr-1" />
+                        {isAssigned ? "Assigned" : "Assign Rider"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
+
           {/* 🛵 Assign Rider Modal */}
           <dialog id="assignModal" className="modal">
             <div className="modal-box max-w-2xl">

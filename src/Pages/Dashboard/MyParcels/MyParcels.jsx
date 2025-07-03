@@ -3,7 +3,7 @@ import React from 'react';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
-import UseAuth from '../../../hooks/UseAuth';
+import UseAuth from '../../../hooks/useAuth';
 
 const MyParcels = () => {
     const { user } = UseAuth();
