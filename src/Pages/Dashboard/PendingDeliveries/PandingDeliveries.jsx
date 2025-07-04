@@ -1,9 +1,3 @@
-// 
-// import useAxiosSecure from '../../../hooks/useAxiosSecure';
-// import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-// import useAuth from '../../../hooks/useAuth';
-// import Swal from 'sweetalert2';
-// import useTrackingLogger from '../../../hooks/useTrackingLogger';
 import React from 'react';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
