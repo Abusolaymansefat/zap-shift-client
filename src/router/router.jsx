@@ -23,6 +23,7 @@ import RiderRoute from "../routers/RiderRoute";
 import PandingDeliveries from "../Pages/Dashboard/PendingDeliveries/PandingDeliveries";
 import CompletedDeliveries from "../Pages/Dashboard/CompletedDeliveries/CompletedDeliveries";
 import MyEarnings from "../Pages/Dashboard/MyEarnings/MyEarnings";
+import DashbordHome from "../Pages/Dashboard/DashbordHome/DashbordHome";
 
 export const router = createBrowserRouter([
   {
@@ -36,22 +37,30 @@ export const router = createBrowserRouter([
       {
         path: "coverage",
         Component: Coverage,
-        loader:() => fetch('./warehouses.json')
+        loader: () => fetch("./warehouses.json"),
       },
       {
-        path: 'forbidden',
-        Component: Forbidden
+        path: "forbidden",
+        Component: Forbidden,
       },
       {
-        path: 'sendParcel',
-        element: <PrivateRoute><SendParcel></SendParcel></PrivateRoute>,
-        loader:() => fetch('./warehouses.json')
+        path: "sendParcel",
+        element: (
+          <PrivateRoute>
+            <SendParcel></SendParcel>
+          </PrivateRoute>
+        ),
+        loader: () => fetch("./warehouses.json"),
       },
       {
-        path: '/beARider',
-        element: <PrivateRoute><BeARider></BeARider></PrivateRoute>,
-        loader:() => fetch('./warehouses.json')
-      }
+        path: "/beARider",
+        element: (
+          <PrivateRoute>
+            <BeARider></BeARider>
+          </PrivateRoute>
+        ),
+        loader: () => fetch("./warehouses.json"),
+      },
     ],
   },
   {
@@ -69,62 +78,96 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/dashboard',
-    element: <PrivateRoute>
-      <DashboardLayout></DashboardLayout>
-    </PrivateRoute>,
+    path: "/dashboard",
+    element: (
+      <PrivateRoute>
+        <DashboardLayout></DashboardLayout>
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: 'myParcels',
-        Component: MyParcels
+        index: true,
+        Component: DashbordHome
       },
       {
-        path: 'payment/:parcelId',
-        Component: Payment
+        path: "myParcels",
+        Component: MyParcels,
       },
       {
-        path: 'paymentHistory',
-        Component: PaymentHistory
+        path: "payment/:parcelId",
+        Component: Payment,
       },
       {
-        path: 'track',
-        Component: TrackParcel
+        path: "paymentHistory",
+        Component: PaymentHistory,
       },
-      // rider only routers 
+      {
+        path: "track",
+        Component: TrackParcel,
+      },
+      // rider only routers
 
       {
-        path: 'PandingDeliveries',
-        element: <RiderRoute><PandingDeliveries></PandingDeliveries></RiderRoute>
+        path: "PandingDeliveries",
+        element: (
+          <RiderRoute>
+            <PandingDeliveries></PandingDeliveries>
+          </RiderRoute>
+        ),
       },
       {
-        path: 'completedDeliveries',
-        element: <RiderRoute><CompletedDeliveries></CompletedDeliveries></RiderRoute>
+        path: "completedDeliveries",
+        element: (
+          <RiderRoute>
+            <CompletedDeliveries></CompletedDeliveries>
+          </RiderRoute>
+        ),
       },
       {
-        path: 'myEarnings',
-        element: <RiderRoute><MyEarnings></MyEarnings></RiderRoute>
+        path: "myEarnings",
+        element: (
+          <RiderRoute>
+            <MyEarnings></MyEarnings>
+          </RiderRoute>
+        ),
       },
       // admin only routers
       {
-        path: 'pendingRiders',
+        path: "pendingRiders",
         // Component: PendingRiders
-        element: <AdminRoute><PendingRiders></PendingRiders></AdminRoute>
+        element: (
+          <AdminRoute>
+            <PendingRiders></PendingRiders>
+          </AdminRoute>
+        ),
       },
       {
-        path: 'activeRiders',
+        path: "activeRiders",
         // Component: ActiveRiders
-        element: <AdminRoute><ActiveRiders></ActiveRiders></AdminRoute>
+        element: (
+          <AdminRoute>
+            <ActiveRiders></ActiveRiders>
+          </AdminRoute>
+        ),
       },
       {
-        path: 'makeAdmin',
+        path: "makeAdmin",
         // Component: <MakeAdmin></MakeAdmin>
-        element: <AdminRoute><MakeAdmin></MakeAdmin></AdminRoute>
+        element: (
+          <AdminRoute>
+            <MakeAdmin></MakeAdmin>
+          </AdminRoute>
+        ),
       },
       {
-        path: 'assinRiders',
+        path: "assinRiders",
         // Component: <AssignRider></AssignRider>
-        element: <AdminRoute><AssignRider></AssignRider></AdminRoute>
-      }
-    ]
-  }
+        element: (
+          <AdminRoute>
+            <AssignRider></AssignRider>
+          </AdminRoute>
+        ),
+      },
+    ],
+  },
 ]);
